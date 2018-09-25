@@ -1,0 +1,3 @@
+*Created github repository.
+*Imported template for thesis paper on sharelatex.com / overleaf.com.
+*Initialized to-do list.
