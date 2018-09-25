@@ -1,0 +1,5 @@
+Program that processes raw signals and maps to 5 finger outputs. 
+Uses machine learning algorithms to recognize placements of myo armband, as well as
+state machines to decide directions of finger flex depending on the current state 
+of the "digital" finger. Digital finger is represented as a number in the software which
+determines a virtual position.
