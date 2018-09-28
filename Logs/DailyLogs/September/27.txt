@@ -1,0 +1,6 @@
+*Downloaded SDK
+*Looked at sample code. Need to learn C++. I already know C, should be a simple endeavor.
+	- By looking at the sample code, I was able to determine how to get raw signals to be output on a windows console. Now, I need
+		to take the readings and have them either on a text file or sent directly to another program, will look into PuTTy.
+*Learned that the myo armband comes with an API called "the hub" which will allow cross-program interaction,
+	which is vital for using raw signals processed through the system and communicated into arduino.
