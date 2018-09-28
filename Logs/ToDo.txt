@@ -1,4 +1,4 @@
-Figure out the SDK for the myo armband.
+Figure out the SDK for the myo armband ~ (DONE)
 Figure which microcontroller is best suited for this project.
 Develop software that recognizes the orientation of the myo-band on the arm.
 Record Data and analyze the characteristics.
