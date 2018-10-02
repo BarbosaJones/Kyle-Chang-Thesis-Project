@@ -1,0 +1,10 @@
+*Recorded data for individual finger characteristics
+	-Added the data text files
+	-Plotted the data text files
+*Still need to do many other gestures and combinations, but the main chunks which consist of the individual finger characteristics 
+	been completed. Soon, I must analyze the characteristics to create a map to finger control in my program.
+*Next step will be to add on to the current program which reads the raw data. I must add 5 more columns of integers which represent
+	a virtual hand, represented by integers where positive is flexed, negative is closed, and 0 is relaxed.
+	-This virtual hand will be used in conjunction with the mapped library of gesture characteristics to create a complex
+		statemachine. The virtual hand's 5 integers will be altered determined by the raw signals coming in from the 
+		myo armband.
