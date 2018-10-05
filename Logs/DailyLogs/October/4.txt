@@ -1,0 +1,12 @@
+*Crash Coursing C++ to become very familiar with the program, as it under the Microsoft Visual Studios IDE will be my central hub
+	for development.
+*Did some research on how to communicate my code to an arduino. It is possible to program an arduino using Mircrosoft Visual Studios,
+	but I need to learn how to set everything up, including the makefile.
+*As everything comes clearer, I now have an updated schedule
+	- I will finish characterizing the data and create my finished program that uses a simulated virtual hand by the end of 
+		Fall Quarter. 
+	- During winter break, I will 3-D print my mechanical arm, assemble it along with servo motors, wire up the components to 
+		the arduino. This may carry over into Winter Quarter
+	- By the end of Spring Quarter, the final product should have many adjustments done to it, along with someone without a
+		hand to run some clinical trials. 
+	- The entire Spring Quarter should be left to write a good thesis paper. 

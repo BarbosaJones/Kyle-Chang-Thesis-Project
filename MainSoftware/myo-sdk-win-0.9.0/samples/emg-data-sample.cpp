@@ -12,8 +12,6 @@
 
 #include <myo/myo.hpp>
 
-std::ofstream myfile("a.txt");
-int lineCounter = 0;
 
 class DataCollector : public myo::DeviceListener {
 public:
@@ -42,12 +40,12 @@ public:
 	// For this example, the functions overridden above are sufficient.
 
 	// We define this function to print the current values that were updated by the on...() functions above.
-	void print()
+	void print(int &lineCounter, std::ofstream &myfile)
 	{
 		lineCounter++;
 		// Clear the current line
 		std::cout << '\n';
-		myfile << '\n' << lineCounter << ' ';
+		myfile << lineCounter << ' ';
 
 		// Print out the EMG data.
 		for (size_t i = 0; i < emgSamples.size(); i++) {
@@ -57,6 +55,7 @@ public:
 
 			std::cout << emgString << std::string(4 - emgString.size(), ' ');
 			myfile << emgString << std::string(4 - emgString.size(), ' ');
+			myfile << '\n';
 		}
 
 		std::cout << std::flush;
@@ -101,6 +100,12 @@ int main(int argc, char** argv)
 		// Hub::run() to send events to all registered device listeners.
 		hub.addListener(&collector);
 
+		//file stream to write into file
+		std::ofstream myfile("a.txt");
+
+		//number the lines to plot it
+		int lineCounter = 0;
+
 		// Finally we enter our main loop.
 		while (1) {
 			// In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
@@ -109,7 +114,7 @@ int main(int argc, char** argv)
 			// After processing events, we call the print() member function we defined above to print out the values we've
 			// obtained from any events that have occurred.
 
-			collector.print();
+			collector.print(lineCounter, myfile);
 		}
 
 		// If a standard exception occurred, we print out its message and exit.
