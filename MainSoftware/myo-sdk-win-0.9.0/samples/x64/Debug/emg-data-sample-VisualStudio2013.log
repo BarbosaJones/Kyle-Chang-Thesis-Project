@@ -1,4 +1,5 @@
-﻿  emg-data-sample.cpp
+﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: The intermediate directory (x64\Debug\) contains files shared from another project (hello-myo-VisualStudio2013.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+  emg-data-sample.cpp
 c:\users\kyle\desktop\kyle-chang-thesis-project\mainsoftware\myo-sdk-win-0.9.0\include\myo\cxx\impl\../detail/ThrowOnError.hpp(39): warning C4297: 'myo::ThrowOnError::~ThrowOnError': function assumed not to throw an exception but does
   c:\users\kyle\desktop\kyle-chang-thesis-project\mainsoftware\myo-sdk-win-0.9.0\include\myo\cxx\impl\../detail/ThrowOnError.hpp(39): note: destructor or deallocator has a (possibly implicit) non-throwing exception specification
 c:\users\kyle\desktop\kyle-chang-thesis-project\mainsoftware\myo-sdk-win-0.9.0\include\myo\cxx\impl\../detail/ThrowOnError.hpp(45): warning C4297: 'myo::ThrowOnError::~ThrowOnError': function assumed not to throw an exception but does

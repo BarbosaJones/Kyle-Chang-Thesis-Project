@@ -52,11 +52,14 @@ public:
 			std::ostringstream oss;
 			oss << static_cast<int>(emgSamples[i]);
 			std::string emgString = oss.str();
-
 			std::cout << emgString << std::string(4 - emgString.size(), ' ');
 			myfile << emgString << std::string(4 - emgString.size(), ' ');
-			myfile << '\n';
 		}
+		
+		int finger[5] = { 0, 1, 2, 3, 4 };
+		std::cout << " " << finger[0] << " " << finger[1] << " " << finger[2] << " " << finger[3] << " " << finger[4];
+		myfile << " " << finger[0] << " " << finger[1] << " " << finger[2] << " " << finger[3] << " " << finger[4];
+		myfile << '\n';
 
 		std::cout << std::flush;
 	}

@@ -1,0 +1,3 @@
+*added 5 columns to be printed out as a console. Will work on a function that tells what these 5 variables will be. They represent
+	position vectors for each finger. 
+*currently mapping out the individual finger characteristics so that I may apply it to the code the next time I work on it.
