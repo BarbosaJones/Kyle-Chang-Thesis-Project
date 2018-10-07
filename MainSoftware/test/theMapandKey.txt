@@ -1,0 +1,56 @@
+For now, orientation will be Palm Down, until we learn how to access accelerometer and mag.
+
+This document only will accomplish a few individual finger flex for testing purposes.
+
+********************************************************************************************************************************
+Flex can only happen during rest state.
+
+No two fingers may be controlled at once for testing purposes, keeping the state machine very linear.
+(from rest state, to one finger flexed state, back to rest state)
+
+Let all readings for each pod be read as abs().
+
+Let us assign the threshold for "neighborhood or about 0" to be 5.
+
+********************************************************************************************************************************
+Average Handler sub-state machine:
+	(seperate state machine from finger states, these states determine how an average should be handled for each pod)
+if last 5 readings are neighborhood of 0 && mark = 0, 
+	reset average to 0, 
+
+if average is in neighborhood of 0 && outlier data is read && mark = 0, 
+	reset average count to start at that reading, add defined mark
+
+(marks = const int value set at beginning of program, can be changed before compiling when needed)
+
+if marked,
+	-1 mark
+	
+
+(which means last  readings for each pods needs to be saved, new data popped into the front of the array each time)
+
+********************************************************************************************************************************
+Rest State: 
+	- If all averages are about 0 && in rest state, stay in rest state
+	- If not in rest state but all averages are about 0, change to Rest State
+	- Transitioning out of state, look at transition state
+	- When entering rest state, return all finger values to 0
+
+
+********************************************************************************************************************************
+Transition State:
+	(This state senses change and handles the data in a way it can be used to determine the next state)
+		- STEP1 : Any pods with averages > 10 triggers this state 
+		- CASE1 : If the next 10 readings prove to maintain this increased averages,
+			*Scan all 8 pods
+				--if averages of POD1 >= 10, POD7 >= 10, POD4 >= 10, POD6 >= 10 POD8 >= 10
+					change to index finger state 
+		
+			  else return to rest state		
+
+********************************************************************************************************************************
+Index Finger State:
+	Increase Index finger by 180 when entering this state
+	Stay in this state until rest state is triggered.
+
+	

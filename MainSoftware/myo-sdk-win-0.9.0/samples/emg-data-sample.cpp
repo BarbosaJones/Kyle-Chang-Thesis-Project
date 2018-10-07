@@ -9,9 +9,11 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <list>
 
 #include <myo/myo.hpp>
 
+const int five = 5;
 
 class DataCollector : public myo::DeviceListener {
 public:
@@ -55,7 +57,7 @@ public:
 			std::cout << emgString << std::string(4 - emgString.size(), ' ');
 			myfile << emgString << std::string(4 - emgString.size(), ' ');
 		}
-		
+
 		int finger[5] = { 0, 1, 2, 3, 4 };
 		std::cout << " " << finger[0] << " " << finger[1] << " " << finger[2] << " " << finger[3] << " " << finger[4];
 		myfile << " " << finger[0] << " " << finger[1] << " " << finger[2] << " " << finger[3] << " " << finger[4];
@@ -64,15 +66,44 @@ public:
 		std::cout << std::flush;
 	}
 
+	void averageHandler() {
+		for (size_t i = 0; i < emgSamples.size(); i++) {
+			std::ostringstream oss;
+			oss << static_cast<int>(emgSamples[i]);
+			std::string emgString = oss.str();
+			if (podHistory[i].size() == 20) {
+				podHistory[i].pop_back();
+				podHistory[i].push_front(emgSamples[i]);
+			}
+			else {
+				podHistory[i].push_front(emgSamples[i]);
+			}
+		}
+
+		std::cout << '\n';
+
+		for (int e = 0; e < 8; e++) {
+			std::cout << "POD " << e << ": ";
+			for (std::list<int>::iterator it = podHistory[e].begin(); it != podHistory[e].end(); it++) {
+				std::cout << *it << " ";
+			}
+			//std::cout << podHistory[e].size();
+			std::cout << '\n';
+		}
+	}
+
 	// The values of this array is set by onEmgData() above.
 	std::array<int8_t, 8> emgSamples;
+
+	std::list<int> podHistory[8];
 };
+
+
 
 int main(int argc, char** argv)
 {
 	// We catch any exceptions that might occur below -- see the catch statement for more details.
 	try {
-
 		// First, we create a Hub with our application identifier. Be sure not to use the com.example namespace when
 		// publishing your application. The Hub provides access to one or more Myos.
 		myo::Hub hub("com.example.emg-data-sample");
@@ -110,7 +141,7 @@ int main(int argc, char** argv)
 		int lineCounter = 0;
 
 		// Finally we enter our main loop.
-		while (1) {
+		for (int o = 1; o < 100; o++) {
 			// In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
 			// In this case, we wish to update our display 50 times a second, so we run for 1000/20 milliseconds.
 			hub.run(1000 / 20);
@@ -118,9 +149,31 @@ int main(int argc, char** argv)
 			// obtained from any events that have occurred.
 
 			collector.print(lineCounter, myfile);
+			collector.averageHandler();
 		}
 
-		// If a standard exception occurred, we print out its message and exit.
+
+		//for podHistory 0-7, traverse the linked list
+		//std::list<int> podHistory[8] = collector.podHistory[8];
+		/*std::cout << '\n';
+		for(int e = 0; e < 8; e++){
+		std::cout << "POD" << e << ": ";
+		for (std::list<int>::iterator it=collector.podHistory[e].begin(); it != collector.podHistory[e].end(); it++){
+		std::cout << *it << ' ' ;
+		}
+		std::cout << '\n';
+		}*/
+
+		/*std::cout << '\n';
+		for(int e = 0; e < 8; e++){
+		std::cout << "POD " << e << ": ";
+		for (std::list<int>::iterator it=collector.podHistory[e].begin(); it != collector.podHistory[e].end(); it++){
+		std::cout << collector.podHistory[e].size();
+		}
+		std::cout << '\n';
+		}*/
+
+		std::cin.ignore();
 	}
 	catch (const std::exception& e) {
 		std::cerr << "Error: " << e.what() << std::endl;

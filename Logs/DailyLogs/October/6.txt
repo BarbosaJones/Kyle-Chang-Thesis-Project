@@ -1,0 +1,3 @@
+*Added TheMapandKey which will be the English translation of what I am trying to code.
+*Began state machines by adding a average handler which also keeps track of the past 20 reads for each pods.
+*Code is updated in sample txt file.
