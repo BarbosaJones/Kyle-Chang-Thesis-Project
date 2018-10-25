@@ -13,7 +13,7 @@
 
 #include <myo/myo.hpp>
 
-const int five = 5;
+const int avgMarkCount = 5;
 
 class DataCollector : public myo::DeviceListener {
 public:
@@ -58,7 +58,6 @@ public:
 			myfile << emgString << std::string(4 - emgString.size(), ' ');
 		}
 
-		int finger[5] = { 0, 1, 2, 3, 4 };
 		std::cout << " " << finger[0] << " " << finger[1] << " " << finger[2] << " " << finger[3] << " " << finger[4];
 		myfile << " " << finger[0] << " " << finger[1] << " " << finger[2] << " " << finger[3] << " " << finger[4];
 		myfile << '\n';
@@ -67,36 +66,145 @@ public:
 	}
 
 	void averageHandler() {
+		int podSum = 0;
+
 		for (size_t i = 0; i < emgSamples.size(); i++) {
 			std::ostringstream oss;
 			oss << static_cast<int>(emgSamples[i]);
 			std::string emgString = oss.str();
 			if (podHistory[i].size() == 20) {
 				podHistory[i].pop_back();
-				podHistory[i].push_front(emgSamples[i]);
+				podHistory[i].push_front(abs(emgSamples[i]));
 			}
 			else {
-				podHistory[i].push_front(emgSamples[i]);
+				podHistory[i].push_front(abs(emgSamples[i]));
 			}
+			sum[i] += abs(emgSamples[i]);
+			counter[i]++;
 		}
-
 		std::cout << '\n';
 
-		for (int e = 0; e < 8; e++) {
-			std::cout << "POD " << e << ": ";
-			for (std::list<int>::iterator it = podHistory[e].begin(); it != podHistory[e].end(); it++) {
-				std::cout << *it << " ";
+		//prints out podHistory
+		/*for (int pod = 0; pod < 8; pod++) {
+		std::cout << "POD " << pod << ": ";
+		for (std::list<int>::iterator it = podHistory[pod].begin(); it != podHistory[pod].end(); it++) {
+		std::cout << *it << " ";
+		}
+		std::cout << '\n';
+		}*/
+
+		//average from most recent 8
+		for (int pod = 0; pod < 8; pod++) {
+			podSum = 0;
+			std::list<int>::iterator it = podHistory[pod].begin();
+			for (int z = 0; z < 8; z++) {
+				if (it == podHistory[pod].end()) {
+					break;
+				}
+				else {
+					podSum += *it;
+					it++;
+				}
 			}
-			//std::cout << podHistory[e].size();
-			std::cout << '\n';
+
+			float avgAll = (float)sum[pod] / (float)counter[pod];
+			float podAvg = (float)podSum / 8.0;
+
+			std::cout << "podAvg for " << pod << ": " << podAvg << std::endl;
+			std::cout << "avgAll for " << pod << ": " << avgAll << std::endl;
+
+
+			if (podAvg < 5.0 && avgAll > 5.0) {
+				sum[pod] = 0;
+				counter[pod] = 0;
+				std::cout << "pod " << pod << " RESET\n";
+			}
 		}
 	}
+
+	int stateHandler(int state, int &flag) {
+		switch (state) {
+		case 0: //rest 
+			for (int pod = 0; pod < 8; pod++) {
+				if (((float)sum[pod] / (float)counter[pod]) < 5.0) { //avgAll
+					state = 0;
+				}
+				else {
+					flag = 10;
+					state = 1;
+				}
+			}
+			break;
+
+		case 1:   //transition                 
+			if (flag > 0) {
+				flag--;
+			}
+			else {
+				//average from most recent 10
+				for (int pod = 0; pod < 8; pod++) {
+					int podSum = 0;
+					std::list<int>::iterator it = podHistory[pod].begin();
+					std::cout << "POD " << pod << ": ";
+					for (int z = 0; z < 10; z++) {
+						podSum += *it;
+						it++;
+					}
+					float podAvg = (float)podSum / 10.0;
+					std::cout << "podAvg for " << pod << ": " << podAvg << std::endl;
+					recentTen[pod] = podAvg;
+					if (recentTen[0] > 10.0 && recentTen[3] > 10.0 && recentTen[5] > 10.0 && recentTen[6] > 10.0 && recentTen[7] > 10.0) {
+						state = 2;
+						std::cout << "state: index state" << std::endl; //del after test
+					}
+
+				}
+			}
+			break;
+
+		case 2:   //index
+			finger[1] = 180;
+			for (int pod = 0; pod < 8; pod++) {
+				if (((float)sum[pod] / (float)counter[pod]) >= 5.0) { //avgAll
+					std::cout << "avgAll for " << pod << ": " << (float)sum[pod] / (float)counter[pod];  //del after test
+					finger[1] = 180;
+					state = 1;
+					std::cout << "finger[1]: " << finger[1] << std::endl; //del after test
+					std::cout << "state: index state" << std::endl; //del after test
+					break;
+				}
+				else {
+					finger[1] = 0;
+					state = 0;
+					std::cout << "finger[1]: " << finger[1] << std::endl; //del after test
+					std::cout << "state: rest state" << std::endl; //del after test
+				}
+			}
+			break;
+
+		}
+
+		return state;
+	}
+
+
 
 	// The values of this array is set by onEmgData() above.
 	std::array<int8_t, 8> emgSamples;
 
+	//sum of entire history
+	int sum[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	//counter for each reading for each pod; used for average
+	int counter[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
+	int recentTen[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
 	std::list<int> podHistory[8];
+
+	int finger[5] = { 0, 0, 0, 0, 0 };
 };
+
 
 
 
@@ -139,6 +247,8 @@ int main(int argc, char** argv)
 
 		//number the lines to plot it
 		int lineCounter = 0;
+		int state = 0;
+		int flag = 10;
 
 		// Finally we enter our main loop.
 		for (int o = 1; o < 100; o++) {
@@ -150,28 +260,8 @@ int main(int argc, char** argv)
 
 			collector.print(lineCounter, myfile);
 			collector.averageHandler();
+			collector.stateHandler(state, flag);
 		}
-
-
-		//for podHistory 0-7, traverse the linked list
-		//std::list<int> podHistory[8] = collector.podHistory[8];
-		/*std::cout << '\n';
-		for(int e = 0; e < 8; e++){
-		std::cout << "POD" << e << ": ";
-		for (std::list<int>::iterator it=collector.podHistory[e].begin(); it != collector.podHistory[e].end(); it++){
-		std::cout << *it << ' ' ;
-		}
-		std::cout << '\n';
-		}*/
-
-		/*std::cout << '\n';
-		for(int e = 0; e < 8; e++){
-		std::cout << "POD " << e << ": ";
-		for (std::list<int>::iterator it=collector.podHistory[e].begin(); it != collector.podHistory[e].end(); it++){
-		std::cout << collector.podHistory[e].size();
-		}
-		std::cout << '\n';
-		}*/
 
 		std::cin.ignore();
 	}
