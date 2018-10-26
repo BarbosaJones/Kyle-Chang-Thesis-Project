@@ -1,0 +1,5 @@
+*past weeks, created state machines and testing out fingers control with basic characterization data.
+*decided that we need to use digital transformation of signals from time domain to frequency domain using fourier
+transformation to see more defined characteristics of the signals. Will spend the next few days reviewing fourier 
+transformation and how to translate it into C++ code, as I am only familiar with applying fourier transformation 
+in matlab

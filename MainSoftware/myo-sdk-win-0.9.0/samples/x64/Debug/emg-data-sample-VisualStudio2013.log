@@ -5,7 +5,7 @@ c:\users\kyle\desktop\kyle-chang-thesis-project\mainsoftware\myo-sdk-win-0.9.0\i
 c:\users\kyle\desktop\kyle-chang-thesis-project\mainsoftware\myo-sdk-win-0.9.0\include\myo\cxx\impl\../detail/ThrowOnError.hpp(45): warning C4297: 'myo::ThrowOnError::~ThrowOnError': function assumed not to throw an exception but does
   c:\users\kyle\desktop\kyle-chang-thesis-project\mainsoftware\myo-sdk-win-0.9.0\include\myo\cxx\impl\../detail/ThrowOnError.hpp(45): note: destructor or deallocator has a (possibly implicit) non-throwing exception specification
 emg-data-sample.cpp(111): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-emg-data-sample.cpp(153): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-emg-data-sample.cpp(155): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+emg-data-sample.cpp(158): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+emg-data-sample.cpp(160): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
   emg-data-sample-VisualStudio2013.vcxproj -> C:\Users\Kyle\Desktop\Kyle-Chang-Thesis-Project\MainSoftware\myo-sdk-win-0.9.0\samples\x64\Debug\emg-data-sample-VisualStudio2013.exe
           1 file(s) copied.

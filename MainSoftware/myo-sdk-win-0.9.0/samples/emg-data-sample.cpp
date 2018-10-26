@@ -84,15 +84,6 @@ public:
 		}
 		std::cout << '\n';
 
-		//prints out podHistory
-		/*for (int pod = 0; pod < 8; pod++) {
-		std::cout << "POD " << pod << ": ";
-		for (std::list<int>::iterator it = podHistory[pod].begin(); it != podHistory[pod].end(); it++) {
-		std::cout << *it << " ";
-		}
-		std::cout << '\n';
-		}*/
-
 		//average from most recent 8
 		for (int pod = 0; pod < 8; pod++) {
 			podSum = 0;
@@ -109,10 +100,10 @@ public:
 
 			float avgAll = (float)sum[pod] / (float)counter[pod];
 			float podAvg = (float)podSum / 8.0;
+			avgAllArr[pod] = avgAll;
 
+			//printed for checking info
 			std::cout << "podAvg for " << pod << ": " << podAvg << std::endl;
-			std::cout << "avgAll for " << pod << ": " << avgAll << std::endl;
-
 
 			if (podAvg < 5.0 && avgAll > 5.0) {
 				sum[pod] = 0;
@@ -120,9 +111,15 @@ public:
 				std::cout << "pod " << pod << " RESET\n";
 			}
 		}
+
+		//printed for checking info
+		for (int pod = 0; pod < 8; pod++) {
+			float avgAll = (float)sum[pod] / (float)counter[pod];
+			std::cout << "avgAll for " << pod << ": " << avgAll << std::endl;
+		}
 	}
 
-	int stateHandler(int state, int &flag) {
+	int stateHandler(int &state, int &flag) {
 		switch (state) {
 		case 0: //rest 
 			for (int pod = 0; pod < 8; pod++) {
@@ -156,6 +153,7 @@ public:
 					if (recentTen[0] > 10.0 && recentTen[3] > 10.0 && recentTen[5] > 10.0 && recentTen[6] > 10.0 && recentTen[7] > 10.0) {
 						state = 2;
 						std::cout << "state: index state" << std::endl; //del after test
+						flag = 10;
 					}
 
 				}
@@ -164,30 +162,50 @@ public:
 
 		case 2:   //index
 			finger[1] = 180;
-			for (int pod = 0; pod < 8; pod++) {
-				if (((float)sum[pod] / (float)counter[pod]) >= 5.0) { //avgAll
-					std::cout << "avgAll for " << pod << ": " << (float)sum[pod] / (float)counter[pod];  //del after test
-					finger[1] = 180;
-					state = 1;
-					std::cout << "finger[1]: " << finger[1] << std::endl; //del after test
-					std::cout << "state: index state" << std::endl; //del after test
-					break;
-				}
-				else {
-					finger[1] = 0;
-					state = 0;
-					std::cout << "finger[1]: " << finger[1] << std::endl; //del after test
-					std::cout << "state: rest state" << std::endl; //del after test
+			float arr[8];
+			if (flag > 0) {
+				flag--;
+			}
+			else {
+				//average from most recent 10
+				for (int pod = 0; pod < 8; pod++) {
+					int podSum = 0;
+					std::list<int>::iterator it = podHistory[pod].begin();
+					std::cout << "POD " << pod << ": ";
+					for (int z = 0; z < 10; z++) {
+						podSum += *it;
+						it++;
+					}
+					float podAvg = (float)podSum / 10.0;
+					std::cout << "podAvg for " << pod << ": " << podAvg << std::endl;
+					arr[pod] = podAvg;
 				}
 			}
-			break;
 
+			// NOTE TO SELF: SAVE THE PAST 10 READS. USE BELOW IF-ELSE TO SEE IF OK. IF OK, YOU OK?
+
+			if (avgAllArr[0] >= 5.0 && avgAllArr[1] < 5.0 && avgAllArr[2] < 5.0 && avgAllArr[3] >= 5.0 && avgAllArr[4] < 5.0 && avgAllArr[5] >= 5.0 && avgAllArr[6] >= 5.0 && avgAllArr[7] >= 5.0) { //avgAll
+				finger[1] = 180;
+				state = 2;
+				std::cout << "finger[1]: " << finger[1] << std::endl; //del after test
+				std::cout << "state: index state" << std::endl; //del after test
+				break;
+			}
+			else {
+				finger[1] = 0;
+				state = 0;
+				std::cout << "finger[1]: " << finger[1] << std::endl; //del after test
+				std::cout << "state: rest state" << std::endl; //del after test
+			}
+			std::string dog;
+			std::cin >> dog;
+			break;
 		}
 
 		return state;
 	}
 
-
+	float avgAllArr[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
 	// The values of this array is set by onEmgData() above.
 	std::array<int8_t, 8> emgSamples;
