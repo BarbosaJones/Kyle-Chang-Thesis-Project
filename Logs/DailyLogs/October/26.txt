@@ -1,0 +1,2 @@
+*Derived Fourier Transform Formula
+*Transcribable to C++, will work on that in the future.
