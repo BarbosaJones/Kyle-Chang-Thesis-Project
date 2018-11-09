@@ -10,10 +10,13 @@
 #include <stdexcept>
 #include <string>
 #include <list>
+#include <cmath>
 
 #include <myo/myo.hpp>
 
 const int avgMarkCount = 5;
+const int PI = 3.14159265;
+const int updateTime = 50;
 
 class DataCollector : public myo::DeviceListener {
 public:
@@ -65,7 +68,7 @@ public:
 		std::cout << std::flush;
 	}
 
-	void averageHandler() {
+	int averageHandler() {
 		int podSum = 0;
 
 		for (size_t i = 0; i < emgSamples.size(); i++) {
@@ -102,8 +105,8 @@ public:
 			float podAvg = (float)podSum / 8.0;
 			avgAllArr[pod] = avgAll;
 
-			//printed for checking info
-			std::cout << "podAvg for " << pod << ": " << podAvg << std::endl;
+			// //printed for checking info
+			// std::cout << "podAvg for " << pod << ": " << podAvg << std::endl;
 
 			if (podAvg < 5.0 && avgAll > 5.0) {
 				sum[pod] = 0;
@@ -111,12 +114,18 @@ public:
 				std::cout << "pod " << pod << " RESET\n";
 			}
 		}
-
-		//printed for checking info
 		for (int pod = 0; pod < 8; pod++) {
-			float avgAll = (float)sum[pod] / (float)counter[pod];
-			std::cout << "avgAll for " << pod << ": " << avgAll << std::endl;
+			if (((float)sum[pod] / (float)counter[pod]) > 5.0) { //avgAll > 5.0 then its leaving the neighborhood
+				return 1; //return 1 to set off fourier info
+			}
 		}
+
+		// //printed for checking info
+		// for(int pod = 0; pod < 8; pod++){
+		// float avgAll = (float)sum[pod] / (float)counter[pod];
+		// std::cout << "avgAll for " << pod << ": " << avgAll << std::endl;
+		// }
+		return 0;
 	}
 
 	int stateHandler(int &state, int &flag) {
@@ -155,7 +164,6 @@ public:
 						std::cout << "state: index state" << std::endl; //del after test
 						flag = 10;
 					}
-
 				}
 			}
 			break;
@@ -205,6 +213,48 @@ public:
 		return state;
 	}
 
+	void fourierDataFill(int q) {
+		for (size_t i = 0; i < emgSamples.size(); i++) {
+			std::ostringstream oss;
+			oss << static_cast<int>(emgSamples[i]);
+			std::string emgString = oss.str();
+			std::cout << emgString << std::string(4 - emgString.size(), ' ');
+			std::cout << "i am putting " << emgString << "in [" << i << "][" << q << "]" << std::endl;
+			fourierData[i][q] = std::stoi(emgString);
+		}
+	}
+
+	void fourier() {
+		// std::ofstream myfile("sample.txt");
+		// std::ofstream myfile("sample-transformed.txt");
+		float f = 0;
+		float time = 0;
+		int sampleSize = 100;
+
+		for (int a = 0; a < 8)
+			for (int z = 0; z < 100; z++) {
+				int An = fourierData[0][];
+				result = cos((-2 * PI * time * f) / sampleSize);
+				std::cout << An << "cos(" << "-2pi * " << f << " * " << time << "over N )" << endl;
+				transformation = An * result;
+			}
+
+		time += 0.5;
+		f += 0.1;
+	}
+
+	void spitter() {
+		std::cout << "\n\n\ndata begin: \n\n\n";
+		for (int row = 0; row < 8; row++) {
+			for (int i = 0; i < 100; i++) {
+				std::cout << "[" << row << "][" << i << "]: " << fourierData[row][i] << " ";
+			}
+			std::cout << std::endl << std::endl;
+		}
+	}
+
+	float fourierArray[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+
 	float avgAllArr[8] = { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
 
 	// The values of this array is set by onEmgData() above.
@@ -221,6 +271,8 @@ public:
 	std::list<int> podHistory[8];
 
 	int finger[5] = { 0, 0, 0, 0, 0 };
+
+	int fourierData[8][100];
 };
 
 
@@ -267,19 +319,31 @@ int main(int argc, char** argv)
 		int lineCounter = 0;
 		int state = 0;
 		int flag = 10;
+		int foo = 0;
 
 		// Finally we enter our main loop.
 		for (int o = 1; o < 100; o++) {
 			// In each iteration of our main loop, we run the Myo event loop for a set number of milliseconds.
 			// In this case, we wish to update our display 50 times a second, so we run for 1000/20 milliseconds.
-			hub.run(1000 / 20);
+			hub.run(updateTime);
 			// After processing events, we call the print() member function we defined above to print out the values we've
 			// obtained from any events that have occurred.
 
 			collector.print(lineCounter, myfile);
-			collector.averageHandler();
-			collector.stateHandler(state, flag);
+			foo = collector.averageHandler();
+			if (foo == 1) {
+				int q = 0;
+				for (int x = 0; x < 100; x++) {
+					hub.run(updateTime);
+					collector.fourierDataFill(q);
+					q++;
+				}
+				break;
+			}
+			// collector.stateHandler(state, flag);          	
 		}
+
+		collector.spitter();
 
 		std::cin.ignore();
 	}
